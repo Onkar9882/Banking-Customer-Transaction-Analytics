@@ -1,0 +1,31 @@
+branch_id,branch_name,city,state,branch_type
+B001,Branch 1,Mango,Uttar Pradesh,Semi-Urban
+B002,Branch 2,Ludhiana,Goa,Rural
+B003,Branch 3,Sikar,Manipur,Rural
+B004,Branch 4,Munger,Uttar Pradesh,Rural
+B005,Branch 5,Mango,Tamil Nadu,Urban
+B006,Branch 6,Jalgaon,Bihar,Rural
+B007,Branch 7,Pimpri-Chinchwad,Andhra Pradesh,Urban
+B008,Branch 8,Jammu,Gujarat,Semi-Urban
+B009,Branch 9,South Dumdum,Chhattisgarh,Urban
+B010,Branch 10,Barasat,Madhya Pradesh,Semi-Urban
+B011,Branch 11,Bhiwani,Mizoram,Semi-Urban
+B012,Branch 12,Udupi,West Bengal,Semi-Urban
+B013,Branch 13,Meerut,Nagaland,Urban
+B014,Branch 14,Dhanbad,West Bengal,Rural
+B015,Branch 15,Tinsukia,Mizoram,Semi-Urban
+B016,Branch 16,Vijayanagaram,Arunachal Pradesh,Rural
+B017,Branch 17,Gangtok,Meghalaya,Rural
+B018,Branch 18,Bhagalpur,Tripura,Urban
+B019,Branch 19,Kavali,Himachal Pradesh,Semi-Urban
+B020,Branch 20,Bathinda,Himachal Pradesh,Urban
+B021,Branch 21,Mirzapur,Uttarakhand,Rural
+B022,Branch 22,Tiruppur,Punjab,Urban
+B023,Branch 23,Yamunanagar,Andhra Pradesh,Urban
+B024,Branch 24,Bahraich,Meghalaya,Semi-Urban
+B025,Branch 25,Burhanpur,Chhattisgarh,Urban
+B026,Branch 26,Motihari,Arunachal Pradesh,Urban
+B027,Branch 27,Ranchi,Maharashtra,Urban
+B028,Branch 28,Indore,Rajasthan,Rural
+B029,Branch 29,Durgapur,Tripura,Rural
+B030,Branch 30,Kolkata,Telangana,Urban
