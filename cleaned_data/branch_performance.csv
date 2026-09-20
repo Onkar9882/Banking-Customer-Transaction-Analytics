@@ -1,0 +1,31 @@
+branch_id,branch_name,city,state,branch_type,customer_count,transaction_count,total_transaction_amount,average_transaction_amount,median_transaction_amount
+B001,Branch 1,Mango,Uttar Pradesh,Semi-Urban,185,1844,91723548.04,49741.62,49807.68
+B002,Branch 2,Ludhiana,Goa,Rural,183,1849,92965987.91,50279.06,50459.27
+B003,Branch 3,Sikar,Manipur,Rural,175,1830,93522087.57,51104.97,51800.63
+B004,Branch 4,Munger,Uttar Pradesh,Rural,179,1776,91086275.47,51287.32,51575.35
+B005,Branch 5,Mango,Tamil Nadu,Urban,192,1924,96169681.03,49984.24,50616.39
+B006,Branch 6,Jalgaon,Bihar,Rural,160,1625,80262389.28,49392.24,48308.33
+B007,Branch 7,Pimpri-Chinchwad,Andhra Pradesh,Urban,175,1723,85812931.91,49804.37,50580.84
+B008,Branch 8,Jammu,Gujarat,Semi-Urban,146,1441,71698945.7,49756.38,49712.88
+B009,Branch 9,South Dumdum,Chhattisgarh,Urban,156,1561,78109405.69,50038.06,50213.88
+B010,Branch 10,Barasat,Madhya Pradesh,Semi-Urban,160,1627,80404857.79,49419.09,49123.79
+B011,Branch 11,Bhiwani,Mizoram,Semi-Urban,166,1692,84571805.17,49983.34,50262.02
+B012,Branch 12,Udupi,West Bengal,Semi-Urban,175,1798,91004756.78,50614.44,51213.78
+B013,Branch 13,Meerut,Nagaland,Urban,167,1732,87674362.27,50620.3,51280.84
+B014,Branch 14,Dhanbad,West Bengal,Rural,145,1408,71751146.03,50959.62,51685.74
+B015,Branch 15,Tinsukia,Mizoram,Semi-Urban,162,1683,82844947.53,49224.57,48832.99
+B016,Branch 16,Vijayanagaram,Arunachal Pradesh,Rural,171,1693,84217200.41,49744.36,49192.7
+B017,Branch 17,Gangtok,Meghalaya,Rural,154,1511,75697660.85,50097.72,50004.07
+B018,Branch 18,Bhagalpur,Tripura,Urban,154,1511,74944749.73,49599.44,49753.98
+B019,Branch 19,Kavali,Himachal Pradesh,Semi-Urban,167,1642,80311608.36,48910.85,48392.6
+B020,Branch 20,Bathinda,Himachal Pradesh,Urban,164,1638,80936761.15,49411.94,49604.5
+B021,Branch 21,Mirzapur,Uttarakhand,Rural,129,1310,65819647.36,50244.01,50112.86
+B022,Branch 22,Tiruppur,Punjab,Urban,162,1592,81267531.91,51047.44,51855.29
+B023,Branch 23,Yamunanagar,Andhra Pradesh,Urban,177,1779,89702851.11,50423.19,49891.38
+B024,Branch 24,Bahraich,Meghalaya,Semi-Urban,158,1565,77834053.03,49734.22,50071.8
+B025,Branch 25,Burhanpur,Chhattisgarh,Urban,176,1778,89911348.19,50568.81,51350.81
+B026,Branch 26,Motihari,Arunachal Pradesh,Urban,176,1707,83949134.62,49179.34,47928.61
+B027,Branch 27,Ranchi,Maharashtra,Urban,176,1744,88363373.61,50667.07,50259.28
+B028,Branch 28,Indore,Rajasthan,Rural,162,1610,78945110.31,49034.23,48956.4
+B029,Branch 29,Durgapur,Tripura,Rural,165,1599,78587994.87,49148.21,49186.46
+B030,Branch 30,Kolkata,Telangana,Urban,183,1808,90018491.6,49788.99,49467.99

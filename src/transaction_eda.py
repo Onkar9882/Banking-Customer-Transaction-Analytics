@@ -1479,7 +1479,7 @@ branch_customer_count = (branch_accounts_df
 ["customer_id"].nunique().reset_index(name="customer_count"))
 
 print("\n ===== Customer By Branch =====")
-print(branch_accounts_df.sort_values("customer_count",ascending=False).head(10))
+print(branch_customer_count.sort_values("customer_count",ascending=False).head(10))
 
 # calculate the number of transactions handled by each branch.
 branch_transaction_count = (branch_transactions_df.groupby("branch_id")["transaction_id"].nunique().reset_index(name="transaction_count"))
@@ -1888,4 +1888,943 @@ print(
 print(
     "6. Use branch-level KPIs in the Power BI dashboard to "
     "monitor customer count, transaction volume, and transaction value."
+)
+
+
+# Account Type Analysis
+customers_df = pd.read_csv("cleaned_data/customers_cleaned.csv")
+accounts_df = pd.read_csv("cleaned_data/accounts_cleaned.csv")
+transactions_df = pd.read_csv("cleaned_data/transactions_prepared.csv")
+
+transactions_df["transaction_date"] = pd.to_datetime(transactions_df["transaction_date"])
+
+# Merge Accounts with Transactions
+account_transactions_df = accounts_df.merge(transactions_df, on="account_id", how="left")
+print("\nAccount Transaction Data:")
+print(account_transactions_df.head())
+
+print("\nAccount Transaction Shape:")
+print(account_transactions_df.shape)
+
+# Customer Count by Account Type
+account_type_customer_count = (accounts_df.groupby("account_type")["customer_id"].nunique().reset_index(name="customer_count")
+.sort_values("customer_count",ascending=False))
+print("\nCustomer count by account type")
+print(account_type_customer_count)
+
+# Transaction Volume by Account Type
+account_type_transaction_count = (account_transactions_df.groupby("account_type")["transaction_id"].nunique()
+.reset_index(name="transaction_count").sort_values("transaction_count", ascending=False))
+print("\nTransaction count by account type")
+print(account_type_transaction_count)
+
+# Transaction Amount Analysis
+account_type_transaction_amount = (account_transactions_df.groupby("account_type")["amount"]
+.agg(total_transaction_amount="sum", average_transaction_amount="mean", median_transaction_amount="median").round(2)
+.reset_index().sort_values("total_transaction_amount",ascending=False))
+print("\nTransaction Amount By Account Type")
+print(account_type_transaction_amount)
+
+# Create One Final Account Type Performance Table
+account_type_performance =(
+account_type_customer_count.merge(account_type_transaction_count, on="account_type", how="left")
+.merge(account_type_transaction_amount, on="account_type", how="left"))
+
+account_type_performance = account_type_performance.fillna(0)
+print("\n========================================")
+print("ACCOUNT TYPE PERFORMANCE")
+print("========================================")
+
+print(account_type_performance)
+
+# Account Status Analysis
+account_status_analysis = (
+    accounts_df
+    .groupby(["account_type", "account_status"])
+    .size()
+    .reset_index(name="account_count")
+)
+
+print("\nAccount Status by Account Type:")
+print(account_status_analysis)
+
+plt.figure(figsize=(8, 5))
+
+sns.barplot(
+    data=account_type_customer_count,
+    x="account_type",
+    y="customer_count"
+)
+
+plt.title("Customer Count by Account Type")
+plt.xlabel("Account Type")
+plt.ylabel("Number of Customers")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+plt.figure(figsize=(8, 5))
+
+sns.barplot(
+    data=account_type_transaction_count,
+    x="account_type",
+    y="transaction_count"
+)
+
+plt.title("Transaction Volume by Account Type")
+plt.xlabel("Account Type")
+plt.ylabel("Number of Transactions")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+plt.figure(figsize=(8, 5))
+
+sns.barplot(
+    data=account_type_transaction_amount,
+    x="account_type",
+    y="total_transaction_amount"
+)
+
+plt.title("Total Transaction Amount by Account Type")
+plt.xlabel("Account Type")
+plt.ylabel("Total Transaction Amount")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+plt.figure(figsize=(8, 5))
+
+sns.barplot(
+    data=account_type_transaction_amount,
+    x="account_type",
+    y="average_transaction_amount"
+)
+
+plt.title("Average Transaction Amount by Account Type")
+plt.xlabel("Account Type")
+plt.ylabel("Average Transaction Amount")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+# Account Type KPI Analysis
+highest_customer_account_type = account_type_performance.loc[
+    account_type_performance["customer_count"].idxmax(),
+    "account_type"
+]
+
+highest_transaction_account_type = account_type_performance.loc[
+    account_type_performance["transaction_count"].idxmax(),
+    "account_type"
+]
+
+highest_value_account_type = account_type_performance.loc[
+    account_type_performance["total_transaction_amount"].idxmax(),
+    "account_type"
+]
+
+highest_average_account_type = account_type_performance.loc[
+    account_type_performance["average_transaction_amount"].idxmax(),
+    "account_type"
+]
+
+print("\n========================================")
+print("ACCOUNT TYPE KPIs")
+print("========================================")
+
+print(
+    f"Account type with highest customers: "
+    f"{highest_customer_account_type}"
+)
+
+print(
+    f"Account type with highest transaction volume: "
+    f"{highest_transaction_account_type}"
+)
+
+print(
+    f"Account type with highest transaction value: "
+    f"{highest_value_account_type}"
+)
+
+print(
+    f"Account type with highest average transaction amount: "
+    f"{highest_average_account_type}"
+)
+
+
+account_type_performance.to_csv(
+    "cleaned_data/account_type_performance.csv",
+    index=False
+)
+
+print(
+    "\nAccount type performance saved successfully."
+)
+
+# ==========================================
+# BUSINESS INSIGHTS
+# ==========================================
+
+print("\n========================================")
+print("ACCOUNT TYPE BUSINESS INSIGHTS")
+print("========================================")
+
+# 1. Highest customer count
+highest_customer_row = account_type_performance.loc[
+    account_type_performance["customer_count"].idxmax()
+]
+
+# 2. Highest transaction volume
+highest_transaction_row = account_type_performance.loc[
+    account_type_performance["transaction_count"].idxmax()
+]
+
+# 3. Highest transaction value
+highest_value_row = account_type_performance.loc[
+    account_type_performance["total_transaction_amount"].idxmax()
+]
+
+# 4. Highest average transaction amount
+highest_average_row = account_type_performance.loc[
+    account_type_performance["average_transaction_amount"].idxmax()
+]
+
+print(
+    f"\n1. Highest customer count: "
+    f"{highest_customer_row['account_type']} "
+    f"({highest_customer_row['customer_count']:.0f} customers)"
+)
+
+print(
+    f"2. Highest transaction volume: "
+    f"{highest_transaction_row['account_type']} "
+    f"({highest_transaction_row['transaction_count']:.0f} transactions)"
+)
+
+print(
+    f"3. Highest transaction value: "
+    f"{highest_value_row['account_type']} "
+    f"({highest_value_row['total_transaction_amount']:.2f})"
+)
+
+print(
+    f"4. Highest average transaction amount: "
+    f"{highest_average_row['account_type']} "
+    f"({highest_average_row['average_transaction_amount']:.2f})"
+)
+
+
+print("\n========================================")
+print("FINAL BUSINESS SUMMARY")
+print("========================================")
+
+print(
+    f"""
+1. {highest_customer_row['account_type']} has the highest
+   customer count.
+
+2. {highest_transaction_row['account_type']} has the highest
+   transaction volume.
+
+3. {highest_value_row['account_type']} has the highest
+   total transaction value.
+
+4. {highest_average_row['account_type']} has the highest
+   average transaction amount.
+
+5. Account types should be compared using both transaction
+   frequency and transaction value rather than using a
+   single metric.
+
+6. Account status analysis can help identify account types
+   with active and inactive accounts.
+
+7. Account type performance can be incorporated into the
+   Power BI dashboard for interactive comparison.
+"""
+)
+
+# ==========================================
+# PAYMENT MODE ANALYSIS
+# ==========================================
+
+transactions_df = pd.read_csv(
+    "cleaned_data/transactions_prepared.csv"
+)
+
+transactions_df["transaction_date"] = pd.to_datetime(
+    transactions_df["transaction_date"]
+)
+
+print("\nTransaction Data:")
+print(transactions_df.head())
+
+
+payment_modes = transactions_df["payment_mode"].value_counts()
+
+print("\nPayment Modes:")
+print(payment_modes)
+
+
+# Transaction Volume by Payment Mode
+payment_mode_transaction_count = (
+    transactions_df
+    .groupby("payment_mode")["transaction_id"]
+    .nunique()
+    .reset_index(name="transaction_count")
+    .sort_values("transaction_count", ascending=False)
+)
+
+print("\nTransaction Count by Payment Mode:")
+print(payment_mode_transaction_count)
+
+# Transaction Amount Analysis
+payment_mode_amount_analysis = (
+    transactions_df
+    .groupby("payment_mode")["amount"]
+    .agg(
+        total_transaction_amount="sum",
+        average_transaction_amount="mean",
+        median_transaction_amount="median"
+    )
+    .round(2)
+    .reset_index()
+    .sort_values(
+        "total_transaction_amount",
+        ascending=False
+    )
+)
+
+print("\nTransaction Amount by Payment Mode:")
+print(payment_mode_amount_analysis)
+
+# Create Payment Mode Performance Table
+payment_mode_performance = (
+    payment_mode_transaction_count
+    .merge(
+        payment_mode_amount_analysis,
+        on="payment_mode",
+        how="left"
+    )
+)
+
+print("\n========================================")
+print("PAYMENT MODE PERFORMANCE")
+print("========================================")
+
+print(payment_mode_performance)
+
+# Transaction Status by Payment Mode
+payment_mode_status = (
+    transactions_df
+    .groupby(
+        ["payment_mode", "transaction_status"]
+    )
+    .size()
+    .reset_index(name="transaction_count")
+)
+
+print("\nTransaction Status by Payment Mode:")
+print(payment_mode_status)
+
+# Calculate Success Rate by Payment Mode
+payment_mode_success_rate = (
+    transactions_df
+    .assign(
+        is_success=(
+            transactions_df["transaction_status"] == "Success"
+        ).astype(int)
+    )
+    .groupby("payment_mode")["is_success"]
+    .mean()
+    .mul(100)
+    .round(2)
+    .reset_index(name="success_rate")
+    .sort_values("success_rate", ascending=False)
+)
+
+print("\nSuccess Rate by Payment Mode:")
+print(payment_mode_success_rate)
+
+
+# Calculate Failure Rate
+payment_mode_failure_rate = (
+    transactions_df
+    .assign(
+        is_failed=(
+            transactions_df["transaction_status"] == "Failed"
+        ).astype(int)
+    )
+    .groupby("payment_mode")["is_failed"]
+    .mean()
+    .mul(100)
+    .round(2)
+    .reset_index(name="failure_rate")
+    .sort_values("failure_rate", ascending=False)
+)
+
+print("\nFailure Rate by Payment Mode:")
+print(payment_mode_failure_rate)
+
+# Create Final Payment Mode KPI Table
+payment_mode_kpi = (
+    payment_mode_performance
+    .merge(
+        payment_mode_success_rate,
+        on="payment_mode",
+        how="left"
+    )
+    .merge(
+        payment_mode_failure_rate,
+        on="payment_mode",
+        how="left"
+    )
+)
+
+print("\n========================================")
+print("FINAL PAYMENT MODE KPI")
+print("========================================")
+
+print(payment_mode_kpi)
+
+plt.figure(figsize=(8, 5))
+
+sns.barplot(
+    data=payment_mode_transaction_count,
+    x="payment_mode",
+    y="transaction_count"
+)
+
+plt.title("Transaction Volume by Payment Mode")
+plt.xlabel("Payment Mode")
+plt.ylabel("Number of Transactions")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+plt.figure(figsize=(8, 5))
+
+sns.barplot(
+    data=payment_mode_amount_analysis,
+    x="payment_mode",
+    y="total_transaction_amount"
+)
+
+plt.title("Total Transaction Amount by Payment Mode")
+plt.xlabel("Payment Mode")
+plt.ylabel("Total Transaction Amount")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+plt.figure(figsize=(8, 5))
+
+sns.barplot(
+    data=payment_mode_amount_analysis,
+    x="payment_mode",
+    y="average_transaction_amount"
+)
+
+plt.title("Average Transaction Amount by Payment Mode")
+plt.xlabel("Payment Mode")
+plt.ylabel("Average Transaction Amount")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+plt.figure(figsize=(8, 5))
+
+sns.barplot(
+    data=payment_mode_success_rate,
+    x="payment_mode",
+    y="success_rate"
+)
+
+plt.title("Transaction Success Rate by Payment Mode")
+plt.xlabel("Payment Mode")
+plt.ylabel("Success Rate (%)")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+# Payment Mode KPIs
+highest_volume_payment_mode = payment_mode_kpi.loc[
+    payment_mode_kpi["transaction_count"].idxmax(),
+    "payment_mode"
+]
+
+highest_value_payment_mode = payment_mode_kpi.loc[
+    payment_mode_kpi["total_transaction_amount"].idxmax(),
+    "payment_mode"
+]
+
+highest_average_payment_mode = payment_mode_kpi.loc[
+    payment_mode_kpi["average_transaction_amount"].idxmax(),
+    "payment_mode"
+]
+
+highest_success_payment_mode = payment_mode_kpi.loc[
+    payment_mode_kpi["success_rate"].idxmax(),
+    "payment_mode"
+]
+
+highest_failure_payment_mode = payment_mode_kpi.loc[
+    payment_mode_kpi["failure_rate"].idxmax(),
+    "payment_mode"
+]
+
+print("\n========================================")
+print("PAYMENT MODE KPIs")
+print("========================================")
+
+print(
+    f"Highest transaction volume: "
+    f"{highest_volume_payment_mode}"
+)
+
+print(
+    f"Highest transaction value: "
+    f"{highest_value_payment_mode}"
+)
+
+print(
+    f"Highest average transaction amount: "
+    f"{highest_average_payment_mode}"
+)
+
+print(
+    f"Highest success rate: "
+    f"{highest_success_payment_mode}"
+)
+
+print(
+    f"Highest failure rate: "
+    f"{highest_failure_payment_mode}"
+)
+
+
+payment_mode_kpi.to_csv(
+    "cleaned_data/payment_mode_performance.csv",
+    index=False
+)
+
+print(
+    "\nPayment mode performance saved successfully."
+)
+
+
+# ==========================================
+# PAYMENT MODE BUSINESS INSIGHTS
+# ==========================================
+
+print("\n========================================")
+print("PAYMENT MODE BUSINESS INSIGHTS")
+print("========================================")
+
+highest_volume_row = payment_mode_kpi.loc[
+    payment_mode_kpi["transaction_count"].idxmax()
+]
+
+highest_value_row = payment_mode_kpi.loc[
+    payment_mode_kpi["total_transaction_amount"].idxmax()
+]
+
+highest_average_row = payment_mode_kpi.loc[
+    payment_mode_kpi["average_transaction_amount"].idxmax()
+]
+
+highest_success_row = payment_mode_kpi.loc[
+    payment_mode_kpi["success_rate"].idxmax()
+]
+
+highest_failure_row = payment_mode_kpi.loc[
+    payment_mode_kpi["failure_rate"].idxmax()
+]
+
+print(
+    f"\n1. Highest transaction volume: "
+    f"{highest_volume_row['payment_mode']} "
+    f"({highest_volume_row['transaction_count']:.0f} transactions)"
+)
+
+print(
+    f"2. Highest transaction value: "
+    f"{highest_value_row['payment_mode']} "
+    f"({highest_value_row['total_transaction_amount']:.2f})"
+)
+
+print(
+    f"3. Highest average transaction amount: "
+    f"{highest_average_row['payment_mode']} "
+    f"({highest_average_row['average_transaction_amount']:.2f})"
+)
+
+print(
+    f"4. Highest success rate: "
+    f"{highest_success_row['payment_mode']} "
+    f"({highest_success_row['success_rate']:.2f}%)"
+)
+
+print(
+    f"5. Highest failure rate: "
+    f"{highest_failure_row['payment_mode']} "
+    f"({highest_failure_row['failure_rate']:.2f}%)"
+)
+
+
+print("\n========================================")
+print("FINAL PAYMENT MODE BUSINESS SUMMARY")
+print("========================================")
+
+print(
+    f"""
+1. {highest_volume_row['payment_mode']} has the highest
+   transaction volume.
+
+2. {highest_value_row['payment_mode']} has the highest
+   total transaction value.
+
+3. {highest_average_row['payment_mode']} has the highest
+   average transaction amount.
+
+4. {highest_success_row['payment_mode']} has the highest
+   transaction success rate.
+
+5. {highest_failure_row['payment_mode']} has the highest
+   transaction failure rate.
+
+6. Payment modes should be evaluated using both transaction
+   frequency and transaction value.
+
+7. Payment modes with relatively higher failure rates should
+   be investigated using additional operational data.
+
+8. Payment mode KPIs can be incorporated into the Power BI
+   dashboard for interactive analysis.
+"""
+)
+
+# ==========================================
+# TRANSACTION CATEGORY ANALYSIS
+# ==========================================
+
+transactions_df = pd.read_csv(
+    "cleaned_data/transactions_prepared.csv"
+)
+
+transactions_df["transaction_date"] = pd.to_datetime(
+    transactions_df["transaction_date"]
+)
+
+print("\nTransaction Data:")
+print(transactions_df.head())
+
+
+category_count = transactions_df["category"].value_counts()
+
+print("\nTransaction Categories:")
+print(category_count)
+
+# Transaction Volume by Category
+category_transaction_count = (
+    transactions_df
+    .groupby("category")["transaction_id"]
+    .nunique()
+    .reset_index(name="transaction_count")
+    .sort_values("transaction_count", ascending=False)
+)
+
+print("\nTransaction Count by Category:")
+print(category_transaction_count)
+
+# Total Transaction Amount by Category
+category_transaction_amount = (
+    transactions_df
+    .groupby("category")["amount"]
+    .agg(
+        total_transaction_amount="sum",
+        average_transaction_amount="mean",
+        median_transaction_amount="median"
+    )
+    .round(2)
+    .reset_index()
+    .sort_values(
+        "total_transaction_amount",
+        ascending=False
+    )
+)
+
+print("\nTransaction Amount by Category:")
+print(category_transaction_amount)
+
+# Create Final Category Performance Table
+category_performance = (
+    category_transaction_count
+    .merge(
+        category_transaction_amount,
+        on="category",
+        how="left"
+    )
+)
+
+print("\n========================================")
+print("CATEGORY PERFORMANCE")
+print("========================================")
+
+print(category_performance)
+
+# Transaction Type by Category
+category_transaction_type = (
+    transactions_df
+    .groupby(
+        ["category", "transaction_type"]
+    )
+    .size()
+    .reset_index(name="transaction_count")
+)
+
+print("\nTransaction Type by Category:")
+print(category_transaction_type)
+
+# Category Success Rate
+category_success_rate = (
+    transactions_df
+    .assign(
+        is_success=(
+            transactions_df["transaction_status"] == "Success"
+        ).astype(int)
+    )
+    .groupby("category")["is_success"]
+    .mean()
+    .mul(100)
+    .round(2)
+    .reset_index(name="success_rate")
+    .sort_values("success_rate", ascending=False)
+)
+
+print("\nSuccess Rate by Category:")
+print(category_success_rate)
+
+# Create Final Category KPI Table
+category_kpi = (
+    category_performance
+    .merge(
+        category_success_rate,
+        on="category",
+        how="left"
+    )
+)
+
+print("\n========================================")
+print("FINAL CATEGORY KPI")
+print("========================================")
+
+print(category_kpi)
+
+
+
+plt.figure(figsize=(10, 6))
+
+sns.barplot(
+    data=category_transaction_count,
+    x="category",
+    y="transaction_count"
+)
+
+plt.title("Transaction Volume by Category")
+plt.xlabel("Transaction Category")
+plt.ylabel("Number of Transactions")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+plt.figure(figsize=(10, 6))
+
+sns.barplot(
+    data=category_transaction_amount,
+    x="category",
+    y="total_transaction_amount"
+)
+
+plt.title("Total Transaction Amount by Category")
+plt.xlabel("Transaction Category")
+plt.ylabel("Total Transaction Amount")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+
+plt.figure(figsize=(10, 6))
+
+sns.barplot(
+    data=category_transaction_amount,
+    x="category",
+    y="average_transaction_amount"
+)
+
+plt.title("Average Transaction Amount by Category")
+plt.xlabel("Transaction Category")
+plt.ylabel("Average Transaction Amount")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+plt.figure(figsize=(10, 6))
+
+sns.barplot(
+    data=category_success_rate,
+    x="category",
+    y="success_rate"
+)
+
+plt.title("Transaction Success Rate by Category")
+plt.xlabel("Transaction Category")
+plt.ylabel("Success Rate (%)")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+# Identify Category KPIs
+highest_volume_category = category_kpi.loc[
+    category_kpi["transaction_count"].idxmax(),
+    "category"
+]
+
+highest_value_category = category_kpi.loc[
+    category_kpi["total_transaction_amount"].idxmax(),
+    "category"
+]
+
+highest_average_category = category_kpi.loc[
+    category_kpi["average_transaction_amount"].idxmax(),
+    "category"
+]
+
+highest_success_category = category_kpi.loc[
+    category_kpi["success_rate"].idxmax(),
+    "category"
+]
+
+print("\n========================================")
+print("CATEGORY KPIs")
+print("========================================")
+
+print(
+    f"Highest transaction volume category: "
+    f"{highest_volume_category}"
+)
+
+print(
+    f"Highest transaction value category: "
+    f"{highest_value_category}"
+)
+
+print(
+    f"Highest average transaction category: "
+    f"{highest_average_category}"
+)
+
+print(
+    f"Highest success rate category: "
+    f"{highest_success_category}"
+)
+
+
+category_kpi.to_csv(
+    "cleaned_data/category_performance.csv",
+    index=False
+)
+
+print(
+    "\nCategory performance saved successfully."
+)
+
+
+# ==========================================
+# CATEGORY BUSINESS INSIGHTS
+# ==========================================
+
+print("\n========================================")
+print("TRANSACTION CATEGORY BUSINESS INSIGHTS")
+print("========================================")
+
+highest_volume_row = category_kpi.loc[
+    category_kpi["transaction_count"].idxmax()
+]
+
+highest_value_row = category_kpi.loc[
+    category_kpi["total_transaction_amount"].idxmax()
+]
+
+highest_average_row = category_kpi.loc[
+    category_kpi["average_transaction_amount"].idxmax()
+]
+
+highest_success_row = category_kpi.loc[
+    category_kpi["success_rate"].idxmax()
+]
+
+print(
+    f"\n1. Highest transaction volume category: "
+    f"{highest_volume_row['category']} "
+    f"({highest_volume_row['transaction_count']:.0f} transactions)"
+)
+
+print(
+    f"2. Highest transaction value category: "
+    f"{highest_value_row['category']} "
+    f"({highest_value_row['total_transaction_amount']:.2f})"
+)
+
+print(
+    f"3. Highest average transaction category: "
+    f"{highest_average_row['category']} "
+    f"({highest_average_row['average_transaction_amount']:.2f})"
+)
+
+print(
+    f"4. Highest success rate category: "
+    f"{highest_success_row['category']} "
+    f"({highest_success_row['success_rate']:.2f}%)"
+)
+
+
+print("\n========================================")
+print("FINAL CATEGORY BUSINESS SUMMARY")
+print("========================================")
+
+print(
+    f"""
+1. {highest_volume_row['category']} has the highest
+   transaction volume.
+
+2. {highest_value_row['category']} has the highest
+   total transaction value.
+
+3. {highest_average_row['category']} has the highest
+   average transaction amount.
+
+4. {highest_success_row['category']} has the highest
+   transaction success rate.
+
+5. Transaction frequency and transaction value should
+   be analyzed together to understand category performance.
+
+6. Categories with relatively lower success rates should
+   be investigated using additional operational data.
+
+7. Category-level KPIs can be incorporated into the
+   Power BI dashboard for interactive analysis.
+"""
 )

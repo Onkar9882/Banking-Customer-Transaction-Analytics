@@ -1,0 +1,5 @@
+account_type,customer_count,transaction_count,total_transaction_amount,average_transaction_amount,median_transaction_amount
+Business,1299,13031,648368788.62,49755.87,49831.86
+Current,1267,12556,627124383.89,49946.19,50138.38
+Salary,1256,12638,631724633.07,49986.12,49892.78
+Savings,1178,11775,592892839.7,50351.83,50359.86

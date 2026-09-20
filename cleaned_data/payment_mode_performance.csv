@@ -1,0 +1,6 @@
+payment_mode,transaction_count,total_transaction_amount,average_transaction_amount,median_transaction_amount,success_rate,failure_rate
+ATM,10184,508601373.17,49941.22,50289.52,92.1,4.89
+Credit Card,10022,501079234.25,49997.93,50025.66,92.22,5.02
+Debit Card,9997,501527733.68,50167.82,50196.97,91.9,5.2
+Net Banking,9916,496238685.22,50044.24,50047.92,91.58,5.26
+UPI,9881,492663618.96,49859.69,49728.46,91.88,4.83
