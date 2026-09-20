@@ -1442,3 +1442,450 @@ print(
     "5. Use customer segments in Power BI dashboards to monitor "
     "customer activity, spending patterns, and transaction value."
 )
+
+
+# Branch Performance Analysis
+# Load the Required Data
+
+# BRANCH PERFORMANCE ANALYSIS
+
+branches_df = pd.read_csv("cleaned_data/branches_cleaned.csv")
+accounts_df = pd.read_csv("cleaned_data/accounts_cleaned.csv")
+customers_df = pd.read_csv("cleaned_data/customers_cleaned.csv")
+transactions_df = pd.read_csv("cleaned_data/transactions_prepared.csv")
+transactions_df["transaction_date"] = pd.to_datetime(transactions_df["transaction_date"])
+print("\n===== Data Shapes =====")
+print("Branches:",branches_df.shape)
+print("Accounts:",accounts_df.shape)
+print("Customers:",customers_df.shape)
+print("Transactions:",transactions_df.shape)
+
+
+# Connect Branches with Accounts
+branch_accounts_df = branches_df.merge(accounts_df, on="branch_id", how="left")
+print("\nBranch + Account data")
+print(branch_accounts_df.head())
+print("\nShape:",branch_accounts_df.shape)
+
+# Connect Account with Transactions
+branch_transactions_df = branch_accounts_df.merge(transactions_df, on="account_id", how="left")
+print("\n===== Branch transaction Data =====")
+print(branch_transactions_df.head())
+print("\nShape:",branch_transactions_df.head())
+
+# Branch Customer Count
+branch_customer_count = (branch_accounts_df
+.groupby(["branch_id", "branch_name", "city", "state", "branch_type"])
+["customer_id"].nunique().reset_index(name="customer_count"))
+
+print("\n ===== Customer By Branch =====")
+print(branch_accounts_df.sort_values("customer_count",ascending=False).head(10))
+
+# calculate the number of transactions handled by each branch.
+branch_transaction_count = (branch_transactions_df.groupby("branch_id")["transaction_id"].nunique().reset_index(name="transaction_count"))
+print("\n ===== Transactions By Branch =====")
+print(branch_transaction_count.sort_values("transaction_count",ascending=False).head(10))
+
+# calculate the total transaction value handled by each branch.
+branch_transaction_amount = (branch_transactions_df.groupby("branch_id")["amount"]
+.agg(total_transaction_amount = "sum", average_transaction_amount = "mean", median_transaction_amount = "median").round(2).reset_index())
+print("\n ===== Transaction Value By Branch =====")
+print(
+    branch_transaction_amount
+    .sort_values(
+        "total_transaction_amount",
+        ascending=False
+    )
+    .head(10)
+)
+
+# Create Complete Branch Performance Dataset
+branch_performance = (
+    branch_customer_count
+    .merge(
+        branch_transaction_count,
+        on="branch_id",
+        how="left"
+    )
+    .merge(
+        branch_transaction_amount,
+        on="branch_id",
+        how="left"
+    )
+)
+
+print("\n========== BRANCH PERFORMANCE ==========")
+print(branch_performance.head(10))
+
+# Handle Branches With No Transactions
+branch_performance[
+    [
+        "transaction_count",
+        "total_transaction_amount",
+        "average_transaction_amount",
+        "median_transaction_amount"
+    ]
+] = (
+    branch_performance[
+        [
+            "transaction_count",
+            "total_transaction_amount",
+            "average_transaction_amount",
+            "median_transaction_amount"
+        ]
+    ]
+    .fillna(0)
+)
+
+print("\nMissing values after branch analysis:")
+
+print(
+    branch_performance.isnull().sum()
+)
+
+# Top 10 Branches by Transaction Volume
+top_branches_by_volume = (
+    branch_performance
+    .sort_values(
+        "transaction_count",
+        ascending=False
+    )
+    .head(10)
+)
+
+print("\n========== TOP 10 BRANCHES BY TRANSACTION VOLUME ==========")
+
+print(
+    top_branches_by_volume[
+        [
+            "branch_id",
+            "branch_name",
+            "branch_type",
+            "customer_count",
+            "transaction_count",
+            "total_transaction_amount"
+        ]
+    ]
+)
+
+# Top 10 Branches by Transaction Value
+top_branches_by_value = (
+    branch_performance
+    .sort_values(
+        "total_transaction_amount",
+        ascending=False
+    )
+    .head(10)
+)
+
+print("\n========== TOP 10 BRANCHES BY TRANSACTION VALUE ==========")
+
+print(
+    top_branches_by_value[
+        [
+            "branch_id",
+            "branch_name",
+            "branch_type",
+            "customer_count",
+            "transaction_count",
+            "total_transaction_amount",
+            "average_transaction_amount"
+        ]
+    ]
+)
+
+
+plt.figure(figsize=(12, 6))
+
+sns.barplot(
+    data=top_branches_by_volume,
+    x="transaction_count",
+    y="branch_name"
+)
+
+plt.title("Top 10 Branches by Transaction Volume")
+plt.xlabel("Number of Transactions")
+plt.ylabel("Branch")
+
+plt.tight_layout()
+plt.show()
+
+
+plt.figure(figsize=(12, 6))
+
+sns.barplot(
+    data=top_branches_by_value,
+    x="total_transaction_amount",
+    y="branch_name"
+)
+
+plt.title("Top 10 Branches by Transaction Value")
+plt.xlabel("Total Transaction Amount")
+plt.ylabel("Branch")
+
+plt.tight_layout()
+plt.show()
+
+# Branch Type Analysis
+branch_type_analysis = (
+    branch_performance
+    .groupby("branch_type")
+    .agg(
+        branch_count=("branch_id", "nunique"),
+        customer_count=("customer_count", "sum"),
+        transaction_count=("transaction_count", "sum"),
+        total_transaction_amount=(
+            "total_transaction_amount",
+            "sum"
+        ),
+        average_transaction_amount=(
+            "average_transaction_amount",
+            "mean"
+        )
+    )
+    .round(2)
+)
+
+print("\n========== BRANCH TYPE ANALYSIS ==========")
+print(branch_type_analysis)
+
+plt.figure(figsize=(10, 6))
+
+sns.scatterplot(
+    data=branch_performance,
+    x="customer_count",
+    y="transaction_count",
+    hue="branch_type",
+    s=100
+)
+
+plt.title("Branch Customer Count vs Transaction Volume")
+plt.xlabel("Number of Customers")
+plt.ylabel("Number of Transactions")
+
+plt.tight_layout()
+plt.show()
+
+# Branch Performance KPIs
+highest_volume_branch = (
+    branch_performance
+    .loc[
+        branch_performance["transaction_count"].idxmax()
+    ]
+)
+
+highest_value_branch = (
+    branch_performance
+    .loc[
+        branch_performance[
+            "total_transaction_amount"
+        ].idxmax()
+    ]
+)
+
+highest_customer_branch = (
+    branch_performance
+    .loc[
+        branch_performance[
+            "customer_count"
+        ].idxmax()
+    ]
+)
+
+print("\n========== BRANCH PERFORMANCE KPIs ==========")
+
+print(
+    "Branch with Highest Customer Count:",
+    highest_customer_branch["branch_name"],
+    "| Customers:",
+    int(highest_customer_branch["customer_count"])
+)
+
+print(
+    "Branch with Highest Transaction Volume:",
+    highest_volume_branch["branch_name"],
+    "| Transactions:",
+    int(highest_volume_branch["transaction_count"])
+)
+
+print(
+    "Branch with Highest Transaction Value:",
+    highest_value_branch["branch_name"],
+    "| Amount:",
+    round(
+        highest_value_branch[
+            "total_transaction_amount"
+        ],
+        2
+    )
+)
+
+
+branch_performance.to_csv(
+    "cleaned_data/branch_performance.csv",
+    index=False
+)
+
+print(
+    "\nBranch performance data saved successfully."
+)
+
+# ==========================================
+# BRANCH PERFORMANCE
+# BUSINESS INSIGHT + RECOMMENDATION
+# ==========================================
+
+print("\n========== BUSINESS INSIGHTS ==========")
+
+# ------------------------------------------
+# 1. Highest Customer Count Branch
+# ------------------------------------------
+
+highest_customer_branch = (
+    branch_performance.loc[
+        branch_performance["customer_count"].idxmax()
+    ]
+)
+
+print(
+    f"\nThe branch with the highest customer count is "
+    f"{highest_customer_branch['branch_name']} "
+    f"with {int(highest_customer_branch['customer_count']):,} customers."
+)
+
+
+# ------------------------------------------
+# 2. Highest Transaction Volume Branch
+# ------------------------------------------
+
+highest_volume_branch = (
+    branch_performance.loc[
+        branch_performance["transaction_count"].idxmax()
+    ]
+)
+
+print(
+    f"The branch with the highest transaction volume is "
+    f"{highest_volume_branch['branch_name']} "
+    f"with {int(highest_volume_branch['transaction_count']):,} transactions."
+)
+
+
+# ------------------------------------------
+# 3. Highest Transaction Value Branch
+# ------------------------------------------
+
+highest_value_branch = (
+    branch_performance.loc[
+        branch_performance[
+            "total_transaction_amount"
+        ].idxmax()
+    ]
+)
+
+print(
+    f"The branch with the highest transaction value is "
+    f"{highest_value_branch['branch_name']} "
+    f"with a total transaction value of "
+    f"{highest_value_branch['total_transaction_amount']:,.2f}."
+)
+
+
+# ------------------------------------------
+# 4. Highest Average Transaction Value
+# ------------------------------------------
+
+highest_average_branch = (
+    branch_performance.loc[
+        branch_performance[
+            "average_transaction_amount"
+        ].idxmax()
+    ]
+)
+
+print(
+    f"The branch with the highest average transaction amount is "
+    f"{highest_average_branch['branch_name']} "
+    f"with an average transaction value of "
+    f"{highest_average_branch['average_transaction_amount']:,.2f}."
+)
+
+
+# ------------------------------------------
+# 5. Branch Type Analysis
+# ------------------------------------------
+
+branch_type_analysis = (
+    branch_performance
+    .groupby("branch_type")
+    .agg(
+        branch_count=("branch_id", "nunique"),
+        customer_count=("customer_count", "sum"),
+        transaction_count=("transaction_count", "sum"),
+        total_transaction_amount=(
+            "total_transaction_amount",
+            "sum"
+        )
+    )
+    .round(2)
+)
+
+print("\n========== BRANCH TYPE INSIGHTS ==========")
+
+print(branch_type_analysis)
+
+highest_branch_type_by_value = (
+    branch_type_analysis[
+        "total_transaction_amount"
+    ].idxmax()
+)
+
+highest_branch_type_value = (
+    branch_type_analysis[
+        "total_transaction_amount"
+    ].max()
+)
+
+print(
+    f"\nThe '{highest_branch_type_by_value}' branch type "
+    f"generated the highest total transaction value of "
+    f"{highest_branch_type_value:,.2f}."
+)
+
+
+# ==========================================
+# BUSINESS RECOMMENDATIONS
+# ==========================================
+
+print("\n========== BUSINESS RECOMMENDATIONS ==========")
+
+print(
+    "1. Monitor branches with high transaction volume "
+    "to ensure efficient transaction processing and service quality."
+)
+
+print(
+    "2. Analyze high-value branches separately because "
+    "transaction value can differ from transaction volume."
+)
+
+print(
+    "3. Compare customer count with transaction activity "
+    "to identify branches with high customer concentration "
+    "but relatively lower transaction activity."
+)
+
+print(
+    "4. Analyze branch performance by branch type to understand "
+    "differences between Urban, Semi-Urban, and Rural branches."
+)
+
+print(
+    "5. Investigate the categories and payment modes contributing "
+    "to high transaction activity at individual branches."
+)
+
+print(
+    "6. Use branch-level KPIs in the Power BI dashboard to "
+    "monitor customer count, transaction volume, and transaction value."
+)
