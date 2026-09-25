@@ -4,7 +4,7 @@
 
 The **Banking Customer & Transaction Analytics** project is an end-to-end data analytics project focused on understanding customer profiles, account behavior, transaction patterns, payment methods, banking branches, and customer activity.
 
-The project uses **Python, SQL, MySQL, and Power BI** to perform data cleaning, exploratory data analysis, business analysis, and visualization.
+The project uses **Python, SQL, MySQL, and Power BI** to perform data generation, data cleaning, exploratory data analysis, business analysis, customer segmentation, and interactive visualization.
 
 The dataset is **synthetically generated** for learning and portfolio purposes.
 
@@ -27,12 +27,12 @@ The project focuses on:
 * Evaluating branch performance
 * Understanding customer activity
 * Segmenting customers based on transaction behavior
-* Performing advanced SQL business analysis
-* Creating an interactive Power BI dashboard
+* Performing SQL business analysis
+* Creating interactive Power BI dashboards
 
 ---
 
-## 🗂️ Dataset
+# 🗂️ Dataset
 
 The project contains four main datasets.
 
@@ -151,7 +151,16 @@ banking_customer_transaction_analysis/
 │   └── 06_window_functions.sql
 │
 ├── visualizations/
+│
 ├── powerbi/
+│   ├── README.md
+│   └── screenshots/
+│       ├── overview.png
+│       ├── customer_analysis.png
+│       ├── transaction_analysis.png
+│       ├── branch_account_analysis.png
+│       └── customer_segmentation.png
+│
 ├── reports/
 ├── README.md
 ├── requirements.txt
@@ -187,11 +196,9 @@ Transaction Category Analysis
        ↓
 SQL Business Analysis
        ↓
-Power BI Dashboard
+Power BI Dashboard Development
        ↓
-Business Insights
-       ↓
-Final Report
+GitHub Project Organization
 ```
 
 ---
@@ -233,7 +240,7 @@ Intentional data-quality issues were introduced into the customer dataset for cl
 
 ## Step 4 — Data Cleaning
 
-Performed cleaning on customer, account, transaction and branch datasets.
+Performed cleaning on the customer, account, and transaction datasets.
 
 ### Customer data cleaning
 
@@ -247,7 +254,7 @@ Performed cleaning on customer, account, transaction and branch datasets.
 
 * 5,000 unique customers
 * No duplicate records
-* No missing values in important fields
+* Important missing values handled
 
 ---
 
@@ -330,7 +337,7 @@ Created customer-level metrics such as:
 
 ---
 
-## Customer Segmentation
+# 🎯 Customer Segmentation
 
 Customers were segmented based on transaction behavior.
 
@@ -446,9 +453,7 @@ Created:
 * `branches`
 * `transactions`
 
-with appropriate primary keys and foreign-key relationships.
-
----
+with appropriate primary-key and foreign-key relationships.
 
 ### 2. Customer & Account Analysis
 
@@ -463,8 +468,6 @@ Performed:
 * Total account balance
 * Active vs inactive accounts
 * Account type and account status analysis
-
----
 
 ### 3. Transaction Analysis
 
@@ -483,8 +486,6 @@ Performed:
 * Payment mode success rate
 * High-value transaction analysis
 * Top transactions
-
----
 
 ### 4. JOIN Analysis
 
@@ -506,8 +507,6 @@ Analyzed:
 * Payment mode and customer behavior
 * Successful transaction value by branch
 
----
-
 ### 5. Subqueries
 
 Used subqueries to identify:
@@ -516,8 +515,6 @@ Used subqueries to identify:
 * Accounts with above-average balance
 * Customers with above-average transaction value
 * High-value customers
-
----
 
 ### 6. Common Table Expressions (CTEs)
 
@@ -528,8 +525,6 @@ Used CTEs for:
 * Customer activity segmentation
 * High-value customer analysis
 * Customer transaction analysis
-
----
 
 ### 7. Window Functions
 
@@ -572,6 +567,83 @@ SQL queries are developed and stored in **VS Code** and executed/tested using **
 
 ---
 
+# 📊 Power BI Dashboard
+
+The Power BI stage of the project is complete.
+
+## Dashboard Pages
+
+### 1. Overview
+
+Provides a high-level view of the banking data using:
+
+* Total Customers
+* Total Accounts
+* Total Transactions
+* Total Transaction Amount
+* Average Transaction Amount
+* Total Account Balance
+* Customer distribution
+* Account type distribution
+* Transaction category analysis
+
+### 2. Customer Analysis
+
+Includes:
+
+* Gender distribution
+* Age groups
+* Occupation
+* Income groups
+* State-wise customer distribution
+* Age vs income analysis
+
+### 3. Transaction Analysis
+
+Includes:
+
+* Transaction volume
+* Transaction amount
+* Transaction type
+* Transaction category
+* Payment mode
+* Transaction status
+* Success rate
+* Monthly transaction trends
+* High-value transactions
+
+### 4. Branch & Account Analysis
+
+Includes:
+
+* Accounts by branch
+* Transactions by branch
+* Transaction amount by branch
+* Branch type analysis
+* Account type distribution
+* Account balance by account type
+* Active and inactive accounts
+* Account status by account type
+
+### 5. Customer Segmentation
+
+Includes:
+
+* Customer activity segments
+* Customer spending segments
+* Activity vs spending analysis
+* Average transactions by activity segment
+* Transaction amount by spending segment
+* Customer-level segmentation details
+
+Power BI dashboard documentation and screenshots are available in:
+
+```text
+powerbi/
+```
+
+---
+
 # 💡 Business Questions Answered
 
 This project is designed to answer questions such as:
@@ -581,14 +653,14 @@ This project is designed to answer questions such as:
 3. Which account types have the highest customer base?
 4. Which account types have the highest total balance?
 5. What is the overall transaction volume?
-6. Which transaction categories generate the highest transaction value?
+6. Which transaction categories have the highest transaction value?
 7. Which payment modes are used most frequently?
 8. What percentage of transactions are successful?
 9. Which payment modes have higher transaction success rates?
-10. Which branches generate higher transaction volumes?
-11. Which branches generate higher transaction values?
+10. Which branches have higher transaction volumes?
+11. Which branches have higher transaction values?
 12. Which account types have higher transaction activity?
-13. Who are the high-value customers?
+13. Which customers have high transaction value?
 14. Which customers have high transaction activity?
 15. What are the highest-value transactions?
 16. How do customers compare based on their transaction behavior?
@@ -597,7 +669,7 @@ This project is designed to answer questions such as:
 
 # 📈 Key Analytical Areas
 
-The project focuses on four major business dimensions:
+The project focuses on four major business dimensions.
 
 ### Customer
 
@@ -646,26 +718,7 @@ Transaction Value
 
 This project uses **synthetically generated data** for educational and portfolio purposes.
 
-The geographic, demographic and transaction behavior patterns in this dataset should not be interpreted as real-world banking trends or causal relationships.
-
----
-
-# 🚀 Future Development
-
-The next stage of the project is:
-
-## Power BI Dashboard Development
-
-Planned dashboard areas:
-
-* Banking KPI Overview
-* Customer Analysis
-* Account Analysis
-* Transaction Analysis
-* Payment Mode Analysis
-* Branch Performance
-* Customer Segmentation
-* Interactive filters and slicers
+The geographic, demographic, and transaction behavior patterns in this dataset should not be interpreted as real-world banking trends or causal relationships.
 
 ---
 
@@ -675,7 +728,7 @@ Planned dashboard areas:
 
 Data Science / Data Analytics Enthusiast
 
-Skills:
+### Skills
 
 * Python
 * SQL
@@ -688,4 +741,6 @@ Skills:
 * Machine Learning
 * Data Analysis
 * Git & GitHub
+* VS Code
+
 
